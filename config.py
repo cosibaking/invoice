@@ -56,3 +56,50 @@ else:
         LSTMFLAG=True
         ocrModel = os.path.join(pwd,"models","ocr-english.pth")
 ######################OCR模型######################
+
+######################票种配置######################
+DOC_TYPES = {
+    'vat_e': {
+        'name': '增值税电子普通发票',
+        'detector': 'electronic',
+        'remove_stamp': True,
+        'parser': 'vat_e',
+    },
+    'vat_m': {
+        'name': '增值税普通/专用发票',
+        'detector': 'machine',
+        'remove_stamp': True,
+        'parser': 'vat_m',
+    },
+    'digital_vat': {
+        'name': '数电票',
+        'detector': 'electronic',
+        'remove_stamp': False,
+        'parser': 'digital_vat',
+    },
+    'itinerary': {
+        'name': '电子行程单',
+        'detector': 'electronic',
+        'remove_stamp': False,
+        'parser': 'itinerary',
+    },
+    'train': {
+        'name': '铁路电子客票',
+        'detector': 'electronic',
+        'remove_stamp': False,
+        'parser': 'train',
+    },
+    'taxi': {
+        'name': '出租车发票',
+        'detector': 'electronic',
+        'remove_stamp': False,
+        'parser': 'taxi',
+    },
+    'unknown': {
+        'name': '未知票种',
+        'detector': 'electronic',
+        'remove_stamp': False,
+        'parser': None,
+    },
+}
+######################票种配置######################

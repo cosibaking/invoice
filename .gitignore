@@ -14,6 +14,10 @@ build/
 test/*.jpg
 test/*.pdf
 test/RedThresh_*
+test/fixtures/**/RedThresh_*
 
 # Model weights (local only; download separately, see README.md)
 models/
+
+# Local runtime settings (API keys, overrides)
+config/settings.local.yaml

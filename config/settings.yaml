@@ -1,0 +1,7 @@
+llm_fallback:
+  enabled: false
+  api_url: ""
+  api_key: ""
+  model: "gpt-4o-mini"
+  timeout_seconds: 30
+  max_retries: 1

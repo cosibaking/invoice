@@ -40,3 +40,4 @@ torch
 urllib3
 Werkzeug
 tqdm
+PyYAML

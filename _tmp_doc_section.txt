@@ -1,0 +1,27 @@
+## 13. 附录
+
+### 13.1 关键文件索引
+
+| 文件 | 说明 |
+|------|------|
+| `app.py` | Flask 入口与识别编排 |
+| `config.py` | 全局配置与模型路径 |
+| `model_postE_invoice.py` | 电子票 OCR 完整流水线 |
+| `model_postM_invoice.py` | 机打票 OCR 完整流水线 |
+| `model_post_type.py` | 类型检测 OCR |
+| `application/invoice_e.py` | 电子普票字段解析 |
+| `application/invoice_m.py` | 机打票字段解析 |
+| `text/keras_detectE_invoice.py` | 电子票 YOLO 检测 |
+| `text/keras_detectM_invoice.py` | 机打票 YOLO 检测 |
+| `text/keras_detect_type.py` | 类型 YOLO 检测 |
+| `crnn/crnn_torch.py` | CRNN 推理 |
+| `templates/index.html` | Web 测试页 |
+
+### 13.2 相关文档
+
+- [产品文档](./产品文档.md)
+- 项目 [README](../README.md)
+- 上游参考：[chineseocr](https://github.com/chineseocr/chineseocr)
+
+---
+

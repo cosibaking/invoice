@@ -1,0 +1,7 @@
+{
+  "defaults": {
+    "code": 100,
+    "docType": "vat_e"
+  },
+  "_comment": "将增值税电子普票样本（jpg/png/pdf）放入此目录，并在 samples 中配置各文件期望 fields"
+}

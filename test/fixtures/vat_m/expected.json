@@ -1,0 +1,7 @@
+{
+  "defaults": {
+    "code": 100,
+    "docType": "vat_m"
+  },
+  "_comment": "将增值税机打票/专票样本放入此目录，并在 samples 中配置各文件期望 fields"
+}

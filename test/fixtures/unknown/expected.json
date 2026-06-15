@@ -1,0 +1,9 @@
+{
+  "samples": {
+    "sample.jpg": {
+      "code": 104,
+      "docType": "vat_m",
+      "fields": {}
+    }
+  }
+}

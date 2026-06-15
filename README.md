@@ -35,4 +35,67 @@
    4. 增值税普通普票测试结果
 
 ![Image text](https://github.com/guanshuicheng/invoice/blob/master/test-invoice/%E5%A2%9E%E5%80%BC%E7%A8%8E%E6%99%AE%E9%80%9A%E5%8F%91%E7%A5%A8-test.jpg)
-   
+## 支持的票种（docType）
+
+| docType | 说明 |
+|---------|------|
+| vat_e | 增值税电子普通发票 |
+| vat_m | 增值税普通/专用发票（机打） |
+| digital_vat | 数电票 |
+| itinerary | 电子行程单 |
+| train | 铁路电子客票 |
+| taxi | 出租车发票 |
+| unknown | 未匹配票种（仅返回 OCR 行） |
+
+票种路由与检测模型见 config.py 中的 DOC_TYPES。
+
+## API 响应格式
+
+主接口 `POST /invoice-ocr` 成功时 `data` 包含：
+
+- `docType`：票种标识
+- `docTypeName`：票种中文名
+- `fields`：结构化字段（解析器或 LLM 兜底填充）
+- `rawLines`：OCR 原始行列表（含坐标与文本）
+
+示例：
+
+```json
+{
+  "code": 100,
+  "message": "识别成功",
+  "data": {
+    "docType": "vat_e",
+    "docTypeName": "增值税电子普通发票",
+    "fields": {},
+    "rawLines": []
+  },
+  "FileName": "invoice.jpg",
+  "ocrIdentifyTime": "2026-06-15 16:00:00"
+}
+```
+
+## 调试接口
+
+`POST /ocr-raw`：仅对上传图片做 OCR，返回 `data.rawLines`，不做票种路由与字段解析，便于标注新票种。
+
+## LLM 兜底配置
+
+复制 `config/settings.local.yaml.example` 为 `config/settings.local.yaml`（可选），或在 `config/settings.yaml` 中配置 `llm_fallback`：
+
+- `enabled`：是否启用
+- `api_url` / `api_key` / `model`：兼容 OpenAI 的 HTTP API
+- `timeout_seconds` / `max_retries`
+
+当结构化解析结果为空且 docType 非 unknown 时，可调用 LLM 补全 `fields`。
+
+## 批量回归测试
+
+```bash
+python scripts/batch_test.py --dir test/fixtures/digital_vat
+python scripts/batch_test.py --dir test/fixtures/unknown
+python scripts/batch_test.py --dir test/fixtures/vat_e   # 需先放入样本
+python scripts/batch_test.py --dir test/fixtures/vat_m   # 需先放入样本
+```
+
+各 fixture 目录放置样本图片与 `expected.json`（期望 `code`、`docType`、`fields`）。可按文件名在 `expected.json` 的 `samples` 中配置期望值，例如 `sample.jpg`。

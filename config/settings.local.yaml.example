@@ -1,0 +1,8 @@
+# Copy to settings.local.yaml and customize (settings.local.yaml is gitignored).
+llm_fallback:
+  enabled: true
+  api_url: "http://127.0.0.1:8080/v1/chat/completions"
+  api_key: "your-api-key-here"
+  model: "gpt-4o-mini"
+  timeout_seconds: 30
+  max_retries: 2

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>增值税发票 OCR</title>
+  <title>票据 OCR</title>
   <style>
     body { font-family: sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; }
     h1 { font-size: 1.4rem; }
@@ -14,24 +14,26 @@
     button { margin-top: 12px; padding: 8px 16px; cursor: pointer; }
     pre { background: #f5f5f5; padding: 12px; overflow: auto; white-space: pre-wrap; }
     .error { color: #c00; }
+    .result-section { margin-top: 16px; }
+    .result-section h2 { font-size: 1rem; margin: 0 0 8px; }
   </style>
 </head>
 <body>
-  <h1>增值税发票 OCR 识别</h1>
+  <h1>票据 OCR 识别</h1>
   <p class="hint">
     接口地址：<code>POST /invoice-ocr</code>，参数名 <code>file</code>。<br>
     支持格式：<strong>jpg、jpeg、png、pdf</strong>；PDF 将自动转换并识别<strong>第一页</strong>。<br>
     也可使用 Postman 调用。
   </p>
   <form id="uploadForm">
-    <label for="file" class="file-label">选择发票文件（jpg / png / pdf）</label>
+    <label for="file" class="file-label">选择票据文件（jpg / png / pdf）</label>
     <input type="file" id="file" name="file" accept=".pdf,application/pdf,.jpg,.jpeg,.png,image/jpeg,image/png" required>
     <p class="hint file-hint" id="fileHint">未选择文件</p>
     <br>
     <button type="submit">上传识别</button>
   </form>
   <p id="status"></p>
-  <pre id="result"></pre>
+  <div id="result"></div>
   <script>
     var fileInput = document.getElementById('file');
     var fileHint = document.getElementById('fileHint');
@@ -50,6 +52,10 @@
       }
     });
 
+    function renderSection(title, content) {
+      return '<div class="result-section"><h2>' + title + '</h2><pre>' + content + '</pre></div>';
+    }
+
     document.getElementById('uploadForm').addEventListener('submit', async function (e) {
       e.preventDefault();
       var status = document.getElementById('status');
@@ -60,7 +66,7 @@
       var ext = fileInput.files[0].name.split('.').pop().toLowerCase();
       status.textContent = ext === 'pdf' ? 'PDF 转换并识别中…' : '识别中…';
       status.className = '';
-      result.textContent = '';
+      result.innerHTML = '';
 
       var formData = new FormData();
       formData.append('file', fileInput.files[0]);
@@ -68,9 +74,25 @@
       try {
         var resp = await fetch('/invoice-ocr', { method: 'POST', body: formData });
         var data = await resp.json();
-        status.textContent = resp.ok ? '请求完成' : '请求失败 (' + resp.status + ')';
+        status.textContent = resp.ok ? '请求完成 (code=' + data.code + ')' : '请求失败 (' + resp.status + ')';
         if (!resp.ok) status.className = 'error';
-        result.textContent = JSON.stringify(data, null, 2);
+
+        var html = renderSection('完整响应', JSON.stringify(data, null, 2));
+        if (data.data) {
+          if (data.data.docType !== undefined) {
+            html += renderSection('docType', JSON.stringify({
+              docType: data.data.docType,
+              docTypeName: data.data.docTypeName
+            }, null, 2));
+          }
+          if (data.data.fields !== undefined) {
+            html += renderSection('fields', JSON.stringify(data.data.fields, null, 2));
+          }
+          if (data.data.rawLines !== undefined) {
+            html += renderSection('rawLines', JSON.stringify(data.data.rawLines, null, 2));
+          }
+        }
+        result.innerHTML = html;
       } catch (err) {
         status.textContent = '请求失败：' + err.message;
         status.className = 'error';
