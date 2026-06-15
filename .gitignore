@@ -15,8 +15,5 @@ test/*.jpg
 test/*.pdf
 test/RedThresh_*
 
-# Model weights (exceed GitHub 100MB limit; see models/README.md)
-models/*.pb
-models/*.h5
-models/*.weights
-models/*.pth
+# Model weights (local only; download separately, see README.md)
+models/
