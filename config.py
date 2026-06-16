@@ -29,7 +29,7 @@ GPUID=0##调用GPU序号
 ## nms选择,支持cython,gpu,python
 nmsFlag='gpu'## cython/gpu/python ##容错性 优先启动GPU，其次是cpython 最后是python
 if not GPU:
-    nmsFlag='cython'
+    nmsFlag='python'  # Windows 上 cython_nms 在极端误检时可能不稳定，优先纯 Python
 
 
 ##vgg文字方向检测模型

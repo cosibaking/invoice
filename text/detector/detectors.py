@@ -16,8 +16,8 @@ if nmsFlag=='gpu' and GPU and GPUID is not None:
     cython_nms = None
 
 elif nmsFlag=='python':
-     gpu_nms ==None
-     cython_nms = None
+    gpu_nms = None
+    cython_nms = None
 
 elif nmsFlag=='cython':
     try:

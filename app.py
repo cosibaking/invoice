@@ -11,7 +11,7 @@ import pytz
 
 from model_post import ocr
 from config import DOC_TYPES
-from application.doc_router import route
+from application.doc_router import route, route_by_keywords
 from application.parsers import get_parser
 from application.config_loader import get_settings
 from application.llm_fallback import fallback
@@ -144,14 +144,17 @@ def recognize_document(img_path, file_name=None):
 
     route_lines = ocr(img, detector='electronic')
 
+    # 仅当新票种关键词未命中时，才做去红章 + 类型 OCR（增值税 legacy 路由）。
+    # 非发票图片若强制执行 remove_stamp，RedThresh 会产生大量噪点，导致 YOLO 误检暴增、内存飙升甚至系统崩溃。
     redthresh_lines = None
-    try:
-        red_path = remove_stamp(img_path, stamp_id, upload_path)
-        red_img = imread_unicode(red_path)
-        if red_img is not None:
-            redthresh_lines = ocr(red_img, detector='type')
-    except ValueError:
-        pass
+    if route_by_keywords(route_lines) is None:
+        try:
+            red_path = remove_stamp(img_path, stamp_id, upload_path)
+            red_img = imread_unicode(red_path)
+            if red_img is not None:
+                redthresh_lines = ocr(red_img, detector='type')
+        except ValueError:
+            pass
 
     doc_type = route(route_lines, redthresh_lines)
     doc_cfg = DOC_TYPES.get(doc_type, DOC_TYPES['unknown'])
