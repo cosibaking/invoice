@@ -4,7 +4,7 @@
 from apphelper.image import union_rbox
 import re
 
-from application.parsers.base import BaseParser
+from application.parsers.base import BaseParser, normalize_digits
 
 
 class VatMParser(BaseParser):
@@ -31,9 +31,9 @@ class VatMParser(BaseParser):
         N = len(self.lines)
         for i in range(N):
             txt = self.lines[i]['text'].replace(' ', '')
-            txt = txt.replace(' ', '')
-            res1 = re.findall('(?:(?<!\d)\d{10}(?!\d))', txt)
-            res1 += re.findall('(?:(?<!\d)\d{12}(?!\d))', txt)
+            txt_norm = normalize_digits(txt)
+            res1 = re.findall(r'(?:(?<!\d)\d{10}(?!\d))', txt_norm)
+            res1 += re.findall(r'(?:(?<!\d)\d{12}(?!\d))', txt_norm)
             if len(res1) > 0:
                 No['发票代码'] = res1[0]
                 self.res.update(No)
@@ -46,9 +46,9 @@ class VatMParser(BaseParser):
         nu = {}
         N = len(self.lines)
         for i in range(N):
-            txt = self.lines[i]['text'].replace(' ','')
-            txt = txt.replace(' ','')
-            res1 = re.findall('(?:(?<!\d)\d{8}(?!\d))',txt)
+            txt = self.lines[i]['text'].replace(' ', '')
+            txt_norm = normalize_digits(txt)
+            res1 = re.findall(r'(?:(?<!\d)\d{8}(?!\d))', txt_norm)
             if len(res1) > 0:
                 nu["发票号码"] = res1[0]
                 self.res.update(nu)
@@ -61,11 +61,16 @@ class VatMParser(BaseParser):
         da = {}
         N = len(self.lines)
         for i in range(N):
-            txt = self.lines[i]['text'].replace(' ','')
-            txt = txt.replace(' ','')
-            res1 = re.findall('[0-9]{1,4}年[0-9]{1,2}月[0-9]{1,2}日',txt)
+            txt = self.lines[i]['text'].replace(' ', '')
+            res1 = re.findall(
+                r'日期[:：]?[0-9]{1,4}年[0-9]{1,2}月[0-9]{1,2}日', txt
+            )
+            res1 += re.findall(r'日期[:：]?[0-9]{8}', txt)
+            res1 += re.findall(r'[0-9]{1,4}年[0-9]{1,2}月[0-9]{1,2}日', txt)
             if len(res1) > 0:
-                da["开票日期"] = res1[0]
+                val = res1[0]
+                val = val.replace('日期:', '').replace('日期：', '').replace('日期', '')
+                da["开票日期"] = val
                 self.res.update(da)
                 break
 
@@ -76,9 +81,8 @@ class VatMParser(BaseParser):
         pri = {}
         N = len(self.lines)
         for i in range(N):
-            txt = self.lines[i]['text'].replace(' ','')
-            txt = txt.replace(' ','')
-            res1 = re.findall('￥[0-9]{1,8}.[0-9]{1,2}',txt)
+            txt = self.lines[i]['text'].replace(' ', '')
+            res1 = re.findall(r'[￥¥]([0-9]{1,8}\.[0-9]{1,2})', txt)
             if len(res1) > 0:
                 pri["税后价格"] = res1[0]
                 self.res.update(pri)
@@ -91,12 +95,12 @@ class VatMParser(BaseParser):
         check = {}
         N = len(self.lines)
         for i in range(N):
-            txt = self.lines[i]['text'].replace(' ','')
-            txt = txt.replace(' ','')
-            res = re.findall('校验码[0-9]{1,20}',txt)
-            res += re.findall('码[0-9]{1,20}', txt)
-            res += re.findall('校验码:[0-9]{1,20}',txt)
+            txt = self.lines[i]['text'].replace(' ', '')
+            txt_norm = normalize_digits(txt)
+            res = re.findall(r'校验码[:：]?([0-9]{1,20})', txt_norm)
+            res += re.findall(r'校验码\s*([0-9]{1,20})', txt_norm)
+            res += re.findall(r'码([0-9]{1,20})', txt_norm)
             if len(res) > 0:
-                check['校验码'] = res[0].replace('校验码','').replace('校验码:','').replace('码','')
+                check['校验码'] = res[0]
                 self.res.update(check)
                 break

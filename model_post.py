@@ -33,8 +33,8 @@ DEFAULT_DETECT_PARAMS = dict(
 )
 
 DETECTOR_ALPH = {
-    'electronic': 0.1,
-    'machine': 0.01,
+    'electronic': 0.15,
+    'machine': 0.05,
     'type': 0.01,
 }
 
